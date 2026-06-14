@@ -10,7 +10,7 @@
 // Member_4: ID | NAME | EMAIL | PHONE
 // *********************************************************
 // Task Distribution
-// Member_1: Dataset generator
+// Member_1: 
 // Member_2:
 // Member_3:
 // Member_4:
@@ -47,7 +47,7 @@ int main() {
         return 1;
     }
 
-    string filename = "dataset_" + to_string(n) + ".csv";
+    string filename = "datasets/dataset_" + to_string(n) + ".csv";
     ofstream outFile(filename);
 
     if (!outFile) {
