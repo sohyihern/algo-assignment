@@ -1,8 +1,8 @@
 // *********************************************************
 // Program: dataset_generator.cpp
 // Course: CCP6214 Algorithm Design and Analysis
-// Lecture Class: TC4L
-// Tutorial Class: T13L
+// Lecture Class: TC6L
+// Tutorial Class: T22L
 // Trimester: 2610
 // Member_1: ID | NAME | EMAIL | PHONE
 // Member_2: ID | NAME | EMAIL | PHONE
@@ -55,9 +55,10 @@ int main() {
         return 1;
     }
 
-    // Replace this seed with your group leader student ID seed.
-    // Example from assignment: 243UC247CT -> 2431324730
-    unsigned long long seed = 2431324730ULL;
+    // Group leader student ID: 243UC246W1
+    // U -> 1, C -> 3, W -> 3
+    // Seed: 2431324631
+    unsigned long long seed = 2431324631ULL;//u is unsign,ll is longlong
 
     mt19937_64 rng(seed);
 
