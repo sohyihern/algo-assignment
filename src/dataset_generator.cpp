@@ -79,7 +79,7 @@ int main() {
 
         string randomText = generateRandomString(rng);
 
-        outFile << number << "," << randomText;
+        outFile << number << "/" << randomText;
 
         if (i != n - 1) {
             outFile << "\n";
