@@ -18,73 +18,12 @@
 
 #include "utils.h"
 #include <iostream>
-#include <fstream>
-#include <sstream>
-#include <vector>
-#include <string>
 #include <chrono>
 
 using namespace std;
+using namespace std::chrono;
 
-struct Record {
-    unsigned long long number;
-    string text;
-};
-
-vector<Record> readDataset(const string &filename) {
-    vector<Record> records;
-    ifstream inFile(filename);
-
-    if (!inFile) {
-        cout << "Error: Cannot open input file." << endl;
-        return records;
-    }
-
-    string line;
-
-    while (getline(inFile, line)) {
-        if (line.empty()) {
-            continue;
-        }
-
-        stringstream ss(line);
-        string numberPart;
-        string textPart;
-
-        getline(ss, numberPart, ',');
-        getline(ss, textPart, ',');
-
-        Record record;
-        record.number = stoull(numberPart);
-        record.text = textPart;
-
-        records.push_back(record);
-    }
-
-    inFile.close();
-    return records;
-}
-
-void writeDataset(const string &filename, const vector<Record> &records) {
-    ofstream outFile(filename);
-
-    if (!outFile) {
-        cout << "Error: Cannot create output file." << endl;
-        return;
-    }
-
-    for (size_t i = 0; i < records.size(); i++) {
-        outFile << records[i].number << "," << records[i].text;
-
-        if (i != records.size() - 1) {
-            outFile << "\n";
-        }
-    }
-
-    outFile.close();
-}
-
-// Counting sort by digit place: 1, 10, 100, ...
+// Counting sort by digit place value: 1, 10, 100, ...
 void countingSortByDigit(vector<Record> &records, unsigned long long place) {
     const int base = 10;
     int n = records.size();
@@ -93,7 +32,7 @@ void countingSortByDigit(vector<Record> &records, unsigned long long place) {
     int count[base] = {0};
 
     for (int i = 0; i < n; i++) {
-        int digit = (records[i].number / place) % 10;
+        int digit = (records[i].key / place) % 10;
         count[digit]++;
     }
 
@@ -103,7 +42,7 @@ void countingSortByDigit(vector<Record> &records, unsigned long long place) {
 
     // Go from right to left to keep radix sort stable
     for (int i = n - 1; i >= 0; i--) {
-        int digit = (records[i].number / place) % 10;
+        int digit = (records[i].key / place) % 10;
         output[count[digit] - 1] = records[i];
         count[digit]--;
     }
@@ -127,7 +66,7 @@ void radixSort(vector<Record> &records) {
 string getSizeFromFilename(const string &filename) {
     // Example: dataset_1000.csv -> 1000
     size_t start = filename.find("dataset_");
-    size_t end = filename.find(".csv");
+    size_t end   = filename.find(".csv");
 
     if (start == string::npos || end == string::npos) {
         return "n";
@@ -143,25 +82,25 @@ int main() {
     cout << "Enter dataset filename: ";
     cin >> inputFilename;
 
-    vector<Record> records = readDataset(inputFilename);
+    vector<Record> records = read_dataset(inputFilename);
 
     if (records.empty()) {
         cout << "No records found." << endl;
         return 1;
     }
 
-    auto start = chrono::high_resolution_clock::now();
+    auto start = high_resolution_clock::now();
 
     radixSort(records);
 
-    auto end = chrono::high_resolution_clock::now();
+    auto end = high_resolution_clock::now();
 
-    chrono::duration<double> elapsed = end - start;
+    duration<double> elapsed = end - start;
 
     string sizeText = getSizeFromFilename(inputFilename);
     string outputFilename = "radix_sorted_dataset_" + sizeText + ".csv";
 
-    writeDataset(outputFilename, records);
+    write_dataset(outputFilename, records);
 
     cout << "Radix sort completed successfully." << endl;
     cout << "Input size: " << records.size() << endl;
