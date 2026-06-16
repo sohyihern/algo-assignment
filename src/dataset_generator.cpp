@@ -47,7 +47,7 @@ int main() {
         return 1;
     }
 
-    string filename = "datasets/dataset_" + to_string(n) + ".csv";
+    string filename = ".\\dataset_" + to_string(n) + ".csv";
     ofstream outFile(filename);
 
     if (!outFile) {
