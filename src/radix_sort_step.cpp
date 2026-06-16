@@ -19,9 +19,6 @@
 #include "utils.h"
 #include <iostream>
 #include <fstream>
-#include <sstream>
-#include <vector>
-#include <string>
 
 using namespace std;
 
@@ -34,59 +31,15 @@ const int START_ROW = 1;
 const int END_ROW = 7;
 // ────────────────────────────────────────────────────────
 
-struct Record {
-    unsigned long long number;
-    string text;
-};
-
 vector<Record> readDatasetRows(const string &filename, int startRow, int endRow) {
-    vector<Record> records;
-    ifstream inFile(filename);
+    vector<Record> all = read_dataset(filename);
+    vector<Record> subset;
 
-    if (!inFile) {
-        cout << "Error: Cannot open input file." << endl;
-        return records;
+    for (int i = startRow - 1; i < endRow && i < (int)all.size(); i++) {
+        subset.push_back(all[i]);
     }
 
-    string line;
-    int currentRow = 0;
-
-    while (getline(inFile, line)) {
-        if (line.empty()) {
-            continue;
-        }
-
-        currentRow++;
-
-        if (currentRow < startRow) {
-            continue;
-        }
-
-        if (currentRow > endRow) {
-            break;
-        }
-
-        stringstream ss(line);
-        string numberPart;
-        string textPart;
-
-        getline(ss, numberPart, ',');
-        getline(ss, textPart, ',');
-
-        // Trim trailing carriage return or spaces
-        while (!textPart.empty() && (textPart.back() == '\r' || textPart.back() == ' ')) {
-            textPart.pop_back();
-        }
-
-        Record record;
-        record.number = stoull(numberPart);
-        record.text = textPart;
-
-        records.push_back(record);
-    }
-
-    inFile.close();
-    return records;
+    return subset;
 }
 
 // Counting sort by digit place value: 1, 10, 100, ...
@@ -98,7 +51,7 @@ void countingSortByDigit(vector<Record> &records, unsigned long long place) {
     int count[base] = {0};
 
     for (int i = 0; i < n; i++) {
-        int digit = (records[i].number / place) % 10;
+        int digit = (records[i].key / place) % 10;
         count[digit]++;
     }
 
@@ -108,7 +61,7 @@ void countingSortByDigit(vector<Record> &records, unsigned long long place) {
 
     // Go from right to left to keep radix sort stable
     for (int i = n - 1; i >= 0; i--) {
-        int digit = (records[i].number / place) % 10;
+        int digit = (records[i].key / place) % 10;
         output[count[digit] - 1] = records[i];
         count[digit]--;
     }
@@ -122,7 +75,7 @@ void writeStep(ofstream &outFile, const vector<Record> &records, const string &l
     outFile << "[";
 
     for (size_t i = 0; i < records.size(); i++) {
-        outFile << records[i].number << "/" << records[i].text;
+        outFile << records[i].key << "/" << records[i].value;
 
         if (i != records.size() - 1) {
             outFile << ", ";
@@ -133,9 +86,8 @@ void writeStep(ofstream &outFile, const vector<Record> &records, const string &l
 }
 
 string getSizeFromFilename(const string &filename) {
-    // Example: dataset_1000.csv -> 1000
     size_t start = filename.find("dataset_");
-    size_t end = filename.find(".csv");
+    size_t end   = filename.find(".csv");
 
     if (start == string::npos || end == string::npos) {
         return "n";
@@ -172,8 +124,8 @@ int main() {
 
     // LSD Radix Sort — rightmost digit first (place=1 = units digit)
     // Labels count DOWN: d=10 (units), d=9 (tens), ..., d=1 (billions)
-    // digitPosition 1 → place=1        → label d=10
-    // digitPosition 2 → place=10       → label d=9
+    // digitPosition 1 → place=1           → label d=10
+    // digitPosition 2 → place=10          → label d=9
     // ...
     // digitPosition 10 → place=1000000000 → label d=1
     unsigned long long place = 1;
