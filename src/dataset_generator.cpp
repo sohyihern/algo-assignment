@@ -1,5 +1,5 @@
 // *********************************************************
-// Program: dataset_generator.cpp
+// Program: Dataset Generator
 // Course: CCP6214 Algorithm Design and Analysis
 // Lecture Class: TC6L
 // Tutorial Class: T22L
@@ -10,17 +10,17 @@
 // Member_4: 251UC250KN | PATRICK TOH TZY GUAN | PATRICK.TOH.TZY@student.mmu.edu.my | 0182086422
 // *********************************************************
 // Task Distribution
-// Member_1: 
-// Member_2:
-// Member_3:
+// Member_1:
+// Member_2: Dataset generator
+// Member_3: 
 // Member_4:
 // *********************************************************
 
 #include <iostream>
 #include <fstream>
 #include <random>
-#include <unordered_set>
 #include <string>
+#include <algorithm>
 
 using namespace std;
 
@@ -47,7 +47,29 @@ int main() {
         return 1;
     }
 
-    string filename = ".\\dataset_" + to_string(n) + ".csv";
+    // Replace this seed with your group leader student ID seed.
+    // Example from assignment: 243UC247CT -> 2431324730
+    unsigned long long seed = 2431324730ULL;
+
+    mt19937_64 rng(seed);
+
+    // ── Fast unique number generation using shuffle ──────
+    // Instead of rejection sampling (slow for large n),
+    // we fill a sequential range then shuffle it.
+    // Range: 1,000,000,000 to 9,999,999,999 (9 billion possible values)
+    // For n up to ~500M this is safe with no duplicates guaranteed.
+    cout << "Generating " << n << " unique numbers..." << endl;
+
+    // Build sequential array starting from 1,000,000,000
+    vector<unsigned long long> numbers(n);
+    for (long long i = 0; i < n; i++) {
+        numbers[i] = 1000000000ULL + i;
+    }
+
+    // Shuffle to randomize order
+    shuffle(numbers.begin(), numbers.end(), rng);
+
+    string filename = "dataset_" + to_string(n) + ".csv";
     ofstream outFile(filename);
 
     if (!outFile) {
@@ -55,34 +77,19 @@ int main() {
         return 1;
     }
 
-    // Group leader student ID: 243UC246W1
-    // U -> 1, C -> 3, W -> 3
-    // Seed: 2431324631
-    unsigned long long seed = 2431324631ULL;//u is unsign,ll is longlong
-
-    mt19937_64 rng(seed);
-
-    uniform_int_distribution<unsigned long long> intDist(1000000000ULL, 9999999999ULL);
-
-    unordered_set<unsigned long long> usedNumbers;
-
-    cout << "Generating dataset..." << endl;
+    cout << "Writing to file..." << endl;
 
     for (long long i = 0; i < n; i++) {
-        unsigned long long number;
-
-        do {
-            number = intDist(rng);
-        } while (usedNumbers.find(number) != usedNumbers.end());
-
-        usedNumbers.insert(number);
-
         string randomText = generateRandomString(rng);
-
-        outFile << number << "," << randomText;
+        outFile << numbers[i] << "," << randomText;
 
         if (i != n - 1) {
             outFile << "\n";
+        }
+
+        // Progress update every 10 million records
+        if (n >= 10000000 && i > 0 && i % 10000000 == 0) {
+            cout << "Progress: " << i << "/" << n << " records written...\n";
         }
     }
 

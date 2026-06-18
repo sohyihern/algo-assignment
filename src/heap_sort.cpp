@@ -1,8 +1,8 @@
 // *********************************************************
 // Program: heap_sort.cpp
 // Course: CCP6214 Algorithm Design and Analysis
-// Lecture Class: TC4L
-// Tutorial Class: T13L
+// Lecture Class: TC6L
+// Tutorial Class: T22L
 // Trimester: 2610
 // Member_1: 243UC246W1 | KOH YOU XIANG | KOH.YOU.XIANG@student.mmu.edu.my | 019-6581165
 // Member_2: 243UC246W0 | SOH YI HERN | SOH.YI.HERN@student.mmu.edu.my | 018-2991143
