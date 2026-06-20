@@ -22,17 +22,17 @@ equivalents are in Section 3.8).
 
 ## 1. Compile everything
 
-`dataset_generator` is self-contained. Every other program links with `utils.cpp`.
+Every program is self-contained — compile each on its own (there is no `utils.cpp` to link).
 (These `g++` commands work the same in PowerShell.)
 
 ```powershell
-g++ -std=c++17 -O2 dataset_generator.cpp         -o dataset_generator
-g++ -std=c++17 -O2 radix_sort.cpp             utils.cpp -o radix_sort
-g++ -std=c++17 -O2 heap_sort.cpp              utils.cpp -o heap_sort
-g++ -std=c++17 -O2 hash_table_search.cpp      utils.cpp -o hash_table_search
-g++ -std=c++17 -O2 radix_sort_step.cpp        utils.cpp -o radix_sort_step
-g++ -std=c++17 -O2 heap_sort_step.cpp         utils.cpp -o heap_sort_step
-g++ -std=c++17 -O2 hash_table_search_step.cpp utils.cpp -o hash_table_search_step
+g++ -std=c++17 -O2 dataset_generator.cpp      -o dataset_generator
+g++ -std=c++17 -O2 radix_sort.cpp             -o radix_sort
+g++ -std=c++17 -O2 heap_sort.cpp              -o heap_sort
+g++ -std=c++17 -O2 hash_table_search.cpp      -o hash_table_search
+g++ -std=c++17 -O2 radix_sort_step.cpp        -o radix_sort_step
+g++ -std=c++17 -O2 heap_sort_step.cpp         -o heap_sort_step
+g++ -std=c++17 -O2 hash_table_search_step.cpp -o hash_table_search_step
 ```
 
 ---

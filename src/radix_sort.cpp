@@ -16,12 +16,55 @@
 // Member_4:
 // *********************************************************
 
-#include "utils.h"
 #include <iostream>
 #include <chrono>
+#include <vector>
+#include <string>
+#include <fstream>
 
 using namespace std;
 using namespace std::chrono;
+
+// ── Data model + CSV reader/writer (was in utils.h/.cpp) ──
+struct Record {
+    unsigned long long key;
+    string value;
+};
+
+vector<Record> read_dataset(const string& filename) {
+    vector<Record> dataset;
+    ifstream file(filename);
+    if (!file.is_open()) {
+        cout << "Error: Could not open file " << filename << endl;
+        return dataset;
+    }
+    string line;
+    while (getline(file, line)) {
+        if (line.empty()) continue;
+        size_t commaPos = line.find(',');
+        if (commaPos != string::npos) {
+            Record rec;
+            rec.key = stoull(line.substr(0, commaPos));
+            rec.value = line.substr(commaPos + 1);
+            dataset.push_back(rec);
+        }
+    }
+    file.close();
+    return dataset;
+}
+
+void write_dataset(const string& filename, const vector<Record>& dataset) {
+    ofstream outFile(filename);
+    if (!outFile.is_open()) {
+        cout << "Error: Could not open file for writing: " << filename << endl;
+        return;
+    }
+    for (size_t i = 0; i < dataset.size(); i++) {
+        outFile << dataset[i].key << "/" << dataset[i].value;
+        if (i != dataset.size() - 1) outFile << "\n";
+    }
+    outFile.close();
+}
 
 // Counting sort by digit place value: 1, 10, 100, ...
 void countingSortByDigit(vector<Record> &records, unsigned long long place) {

@@ -17,16 +17,44 @@
 // *********************************************************
 
 
-#include "utils.h"
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <string>
 #include <chrono>
 #include <algorithm>
 #include <cmath>
 
 using namespace std;
 using namespace std::chrono;
+
+// ── Data model + CSV reader (was in utils.h/.cpp) ──
+struct Record {
+    unsigned long long key;
+    string value;
+};
+
+vector<Record> read_dataset(const string& filename) {
+    vector<Record> dataset;
+    ifstream file(filename);
+    if (!file.is_open()) {
+        cout << "Error: Could not open file " << filename << endl;
+        return dataset;
+    }
+    string line;
+    while (getline(file, line)) {
+        if (line.empty()) continue;
+        size_t commaPos = line.find(',');
+        if (commaPos != string::npos) {
+            Record rec;
+            rec.key = stoull(line.substr(0, commaPos));
+            rec.value = line.substr(commaPos + 1);
+            dataset.push_back(rec);
+        }
+    }
+    file.close();
+    return dataset;
+}
 
 // --- AVL Tree Implementation ---
 
