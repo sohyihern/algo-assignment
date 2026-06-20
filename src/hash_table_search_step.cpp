@@ -24,14 +24,7 @@
 
 using namespace std;
 
-// ── Configure these before running ──────────────────────
-// *dataset filename in csv
-const string INPUT_FILE = "dataset_1000.csv";
-// *target to search (use a key FROM the csv for found case,
-//                    use a fake key for not-found case)
-const unsigned long long TARGET = 2008864030ULL;   // found target example
-// const unsigned long long TARGET = 123456789ULL; // not-found target example
-// ────────────────────────────────────────────────────────
+// Input is taken from the command line — see usage in main().
 
 // --- AVL Tree ---
 
@@ -238,7 +231,16 @@ string getSizeFromFilename(const string& filename) {
     return filename.substr(start, end - start);
 }
 
-int main() {
+int main(int argc, char* argv[]) {
+    // Usage: hash_table_search_step <dataset_file.csv> <target_key>
+    if (argc < 3) {
+        cerr << "Usage: " << argv[0] << " <dataset_file.csv> <target_key>" << endl;
+        return 1;
+    }
+
+    const string INPUT_FILE = argv[1];
+    const unsigned long long TARGET = stoull(argv[2]);
+
     // Load dataset
     vector<Record> dataset = read_dataset(INPUT_FILE);
 

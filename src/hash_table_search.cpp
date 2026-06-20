@@ -1,5 +1,5 @@
 // *********************************************************
-// Program: heap_sort_step.cpp
+// Program: hash_table_search.cpp
 // Course: CCP6214 Algorithm Design and Analysis
 // Lecture Class: TC6L
 // Tutorial Class: T22L
@@ -275,25 +275,26 @@ public:
     }
 };
 
-int main() {
-    long long n;
-    cout << "Enter dataset size to search on (e.g. 1000): ";
-    cin >> n;
-
-    if (n <= 0) {
-        cout << "Invalid size." << endl;
+int main(int argc, char* argv[]) {
+    // Usage: hash_table_search <dataset_file.csv> <target_key>
+    if (argc < 3) {
+        cerr << "Usage: " << argv[0] << " <dataset_file.csv> <target_key>" << endl;
         return 1;
     }
 
-    string filename = "datasets/dataset_" + to_string(n) + ".csv";
+    string filename = argv[1];
+    unsigned long long target = stoull(argv[2]);
+
     cout << "Loading dataset " << filename << "..." << endl;
-    
+
     // Using our common utils to read the file
     vector<Record> dataset = read_dataset(filename);
     if (dataset.empty()) {
         cout << "Failed to read dataset. Ensure it has been generated first!" << endl;
         return 1;
     }
+
+    long long n = dataset.size();
 
     cout << "Building Hash Table with AVL Tree Collision Resolution..." << endl;
     HashTable ht(n);
@@ -303,11 +304,7 @@ int main() {
     cout << "Hash Table built successfully." << endl;
 
     // --- Step 3: Specific Target Search ---
-    unsigned long long target;
-    cout << "\nEnter a target 10-digit key to search (copy one from the csv, or enter a fake one): ";
-    cin >> target;
-
-    string step_filename = "outputs/hash_table_search_step_" + to_string(target) + ".txt";
+    string step_filename = "dataset_" + to_string(n) + "_hash_table_search_step_" + to_string(target) + ".txt";
     bool isFound = ht.search_and_record(target, step_filename);
     cout << "Search result and path written to " << step_filename << endl;
     if (isFound) cout << "-> Target FOUND." << endl;
@@ -346,7 +343,7 @@ int main() {
     duration<double> time_worst = end_worst - start_worst;
 
     // Write timing output
-    string time_filename = "outputs/hash_table_search_dataset_" + to_string(n) + ".txt";
+    string time_filename = "hash_table_search_dataset_" + to_string(n) + ".txt";
     ofstream timeFile(time_filename);
     if (timeFile.is_open()) {
         timeFile << "Best case time: " << time_best.count() << " seconds\n";

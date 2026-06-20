@@ -76,11 +76,14 @@ string getSizeFromFilename(const string &filename) {
     return filename.substr(start, end - start);
 }
 
-int main() {
-    string inputFilename;
+int main(int argc, char* argv[]) {
+    // Usage: radix_sort <dataset_file.csv>
+    if (argc < 2) {
+        cerr << "Usage: " << argv[0] << " <dataset_file.csv>" << endl;
+        return 1;
+    }
 
-    cout << "Enter dataset filename: ";
-    cin >> inputFilename;
+    string inputFilename = argv[1];
 
     vector<Record> records = read_dataset(inputFilename);
 

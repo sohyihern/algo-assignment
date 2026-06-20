@@ -22,14 +22,7 @@
 
 using namespace std;
 
-// ── Configure these before running ──────────────────────
-// *dataset_n.csv
-const string INPUT_FILE = "dataset_1000.csv";
-// *start row (1-based row number in csv file)
-const int START_ROW = 1;
-// *end row (1-based, inclusive)
-const int END_ROW = 7;
-// ────────────────────────────────────────────────────────
+// Input is taken from the command line — see usage in main().
 
 vector<Record> readDatasetRows(const string &filename, int startRow, int endRow) {
     vector<Record> all = read_dataset(filename);
@@ -97,7 +90,17 @@ string getSizeFromFilename(const string &filename) {
     return filename.substr(start, end - start);
 }
 
-int main() {
+int main(int argc, char* argv[]) {
+    // Usage: radix_sort_step <dataset_file.csv> <start_row> <end_row>
+    if (argc < 4) {
+        cerr << "Usage: " << argv[0] << " <dataset_file.csv> <start_row> <end_row>" << endl;
+        return 1;
+    }
+
+    const string INPUT_FILE = argv[1];
+    const int START_ROW = stoi(argv[2]);
+    const int END_ROW = stoi(argv[3]);
+
     vector<Record> records = readDatasetRows(INPUT_FILE, START_ROW, END_ROW);
 
     if (records.empty()) {
