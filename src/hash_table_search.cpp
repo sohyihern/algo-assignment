@@ -358,7 +358,10 @@ int main(int argc, char* argv[]) {
     // 2. Average Case: Searching for dataset keys
     vector<unsigned long long> avgKeys;
     avgKeys.reserve(n);
-    for (const auto& rec : dataset) avgKeys.push_back(rec.key); // already random order
+    for (const auto& rec : dataset) avgKeys.push_back(rec.key); 
+    // CRITICAL FIX: We MUST shuffle avgKeys to break the sequential heap allocation memory layout!
+    // This ensures Average Case suffers the exact same Cache Miss penalty as Best and Worst.
+    shuffle(avgKeys.begin(), avgKeys.end(), std::default_random_engine(seed));
 
     // 3. Worst Case: Searching for deepest leaves
     vector<unsigned long long> worstKeysBase = ht.get_worst_case_keys();
