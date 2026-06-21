@@ -23,9 +23,9 @@
 #include <vector>
 #include <string>
 #include <chrono>
+#include <random>
 #include <algorithm>
 #include <cmath>
-#include <random>
 
 using namespace std;
 using namespace std::chrono;
@@ -340,48 +340,46 @@ int main(int argc, char* argv[]) {
     // --- Step 7: Running Time Analysis ---
     cout << "\nPerforming running time analysis (Best, Average, Worst) for " << n << " searches..." << endl;
 
-    // --- Prepare fair cache-friendly test arrays ---
-    // We pre-fill arrays of size 'n' and shuffle them. 
-    // This ensures all 3 cases have identical CPU cache behavior (random memory access)
-    // and eliminates the slow modulo (%) operator from the actual timing loop.
-    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
-
-    // 1. Best Case: Searching for roots
+    // 1. Best Case: Searching for elements that are exactly at the ROOT of the AVL trees
     vector<unsigned long long> roots = ht.get_roots();
     vector<unsigned long long> bestKeys;
     bestKeys.reserve(n);
-    for (long long i = 0; i < n; i++) bestKeys.push_back(roots[i % roots.size()]);
+    for (long long i = 0; i < n; i++) {
+        bestKeys.push_back(roots[i % roots.size()]);
+    }
+    // Shuffle to ensure random bucket access, exactly like Average Case
+    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
     shuffle(bestKeys.begin(), bestKeys.end(), std::default_random_engine(seed));
-
-    // 2. Average Case: Searching for dataset keys
-    vector<unsigned long long> avgKeys;
-    avgKeys.reserve(n);
-    for (const auto& rec : dataset) avgKeys.push_back(rec.key); // already random order
-
-    // 3. Worst Case: Searching for deepest leaves
-    vector<unsigned long long> worstKeysBase = ht.get_worst_case_keys();
-    vector<unsigned long long> worstKeys;
-    worstKeys.reserve(n);
-    for (long long i = 0; i < n; i++) worstKeys.push_back(worstKeysBase[i % worstKeysBase.size()]);
-    shuffle(worstKeys.begin(), worstKeys.end(), std::default_random_engine(seed));
-
-    // --- 1. Best Case Timing ---
     auto start_best = high_resolution_clock::now();
     for (long long i = 0; i < n; i++) {
+        // Rapidly hits the root node and returns immediately
         ht.search(bestKeys[i]);
     }
     auto end_best = high_resolution_clock::now();
     duration<double> time_best = end_best - start_best;
 
-    // --- 2. Average Case Timing ---
+    // 2. Average Case: Searching for randomly picked existing elements from the dataset
+    vector<unsigned long long> avgKeys;
+    avgKeys.reserve(n);
+    for (const auto& rec : dataset) avgKeys.push_back(rec.key);
     auto start_avg = high_resolution_clock::now();
     for (long long i = 0; i < n; i++) {
+        // Will traverse various depths of the tree
         ht.search(avgKeys[i]);
     }
     auto end_avg = high_resolution_clock::now();
     duration<double> time_avg = end_avg - start_avg;
 
-    // --- 3. Worst Case Timing ---
+    // 3. Worst Case: Searching for the deepest leaves across all buckets.
+    vector<unsigned long long> worstKeysBase = ht.get_worst_case_keys();
+    vector<unsigned long long> worstKeys;
+    worstKeys.reserve(n);
+    for (long long i = 0; i < n; i++) {
+        worstKeys.push_back(worstKeysBase[i % worstKeysBase.size()]);
+    }
+    // Shuffle to ensure random bucket access, exactly like Average Case
+    unsigned seed_worst = std::chrono::system_clock::now().time_since_epoch().count();
+    shuffle(worstKeys.begin(), worstKeys.end(), std::default_random_engine(seed_worst));
     auto start_worst = high_resolution_clock::now();
     for (long long i = 0; i < n; i++) {
         ht.search(worstKeys[i]);
