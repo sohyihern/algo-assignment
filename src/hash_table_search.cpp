@@ -25,6 +25,7 @@
 #include <chrono>
 #include <algorithm>
 #include <cmath>
+#include <random>
 
 using namespace std;
 using namespace std::chrono;
@@ -340,33 +341,46 @@ int main(int argc, char* argv[]) {
     else cout << "-> Target NOT FOUND." << endl;
 
     // --- Step 7: Running Time Analysis ---
+    // Build a SEPARATE hash table with a high load factor to force collisions.
+    // This creates deeper AVL trees so Best/Average/Worst times are clearly distinct.
     cout << "\nPerforming running time analysis (Best, Average, Worst) for " << n << " searches..." << endl;
 
+    int stress_size = max(1LL, n / 100); // Load factor ~100 → ~100 items per bucket → AVL depth ~6-7
+    HashTable stress_ht(stress_size);
+    for (const auto& rec : dataset) {
+        stress_ht.insert(rec.key, rec.value);
+    }
+
     // 1. Best Case: Searching for elements that are exactly at the ROOT of the AVL trees
-    vector<unsigned long long> roots = ht.get_roots();
+    //    Root nodes are found in 1 comparison — the absolute minimum work.
+    vector<unsigned long long> roots = stress_ht.get_roots();
     auto start_best = high_resolution_clock::now();
     for (long long i = 0; i < n; i++) {
-        // Rapidly hits the root node and returns immediately
-        ht.search(roots[i % roots.size()]);
+        stress_ht.search(roots[i % roots.size()]);
     }
     auto end_best = high_resolution_clock::now();
     duration<double> time_best = end_best - start_best;
 
     // 2. Average Case: Searching for randomly picked existing elements from the dataset
+    //    Some will be at root, some deeper — represents typical usage.
     auto start_avg = high_resolution_clock::now();
     for (long long i = 0; i < n; i++) {
-        // Will traverse various depths of the tree
-        ht.search(dataset[i % n].key);
+        stress_ht.search(dataset[i % n].key);
     }
     auto end_avg = high_resolution_clock::now();
     duration<double> time_avg = end_avg - start_avg;
 
-    // 3. Worst Case: Searching for the element situated at the deepest leaf in the most populated AVL tree bucket.
-    // This represents the maximum number of comparisons needed for a successful search.
-    unsigned long long worst_key = ht.get_worst_case_key();
+    // 3. Worst Case: Searching for keys that DO NOT exist, forcing full traversal to null.
+    //    Every search must go from root all the way to the deepest leaf before giving up.
+    //    Keys are randomized (not sequential) to prevent CPU cache advantages.
+    vector<unsigned long long> fake_keys(n);
+    mt19937_64 rng(12345);
+    for (long long i = 0; i < n; i++) {
+        fake_keys[i] = 9900000000ULL + (rng() % 100000000ULL);
+    }
     auto start_worst = high_resolution_clock::now();
     for (long long i = 0; i < n; i++) {
-        ht.search(worst_key);
+        stress_ht.search(fake_keys[i]);
     }
     auto end_worst = high_resolution_clock::now();
     duration<double> time_worst = end_worst - start_worst;
