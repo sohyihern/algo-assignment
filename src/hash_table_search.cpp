@@ -289,19 +289,16 @@ public:
         return roots;
     }
 
-    // Helper to find the absolute worst-case key in the entire Hash Table
-    unsigned long long get_worst_case_key() {
-        int max_height = -1;
-        int max_index = 0;
+    // Helper to collect worst-case keys (deepest leaf in each bucket)
+    // Mirrors get_roots() perfectly for a fair comparison
+    vector<unsigned long long> get_worst_case_keys() {
+        vector<unsigned long long> worstKeys;
         for (int i = 0; i < table_size; i++) {
-            int h = table[i].height(table[i].root);
-            if (h > max_height) {
-                max_height = h;
-                max_index = i;
+            if (table[i].root != nullptr) {
+                worstKeys.push_back(table[i].get_deepest_leaf());
             }
         }
-        if (max_height <= 0) return 0; // Fallback
-        return table[max_index].get_deepest_leaf();
+        return worstKeys;
     }
 };
 
@@ -345,42 +342,51 @@ int main(int argc, char* argv[]) {
     // This creates deeper AVL trees so Best/Average/Worst times are clearly distinct.
     cout << "\nPerforming running time analysis (Best, Average, Worst) for " << n << " searches..." << endl;
 
-    int stress_size = max(1LL, n / 100); // Load factor ~100 → ~100 items per bucket → AVL depth ~6-7
-    HashTable stress_ht(stress_size);
-    for (const auto& rec : dataset) {
-        stress_ht.insert(rec.key, rec.value);
-    }
+    // --- Prepare fair cache-friendly test arrays ---
+    // We pre-fill arrays of size 'n' and shuffle them. 
+    // This ensures all 3 cases have identical CPU cache behavior (random memory access)
+    // and eliminates the slow modulo (%) operator from the actual timing loop.
+    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
 
-    // 1. Best Case: Searching for elements that are exactly at the ROOT of the AVL trees
-    //    Root nodes are found in 1 comparison — the absolute minimum work.
-    vector<unsigned long long> roots = stress_ht.get_roots();
+    // 1. Best Case: Searching for roots
+    vector<unsigned long long> roots = ht.get_roots();
+    vector<unsigned long long> bestKeys;
+    bestKeys.reserve(n);
+    for (long long i = 0; i < n; i++) bestKeys.push_back(roots[i % roots.size()]);
+    shuffle(bestKeys.begin(), bestKeys.end(), std::default_random_engine(seed));
+
+    // 2. Average Case: Searching for dataset keys
+    vector<unsigned long long> avgKeys;
+    avgKeys.reserve(n);
+    for (const auto& rec : dataset) avgKeys.push_back(rec.key); // already random order
+
+    // 3. Worst Case: Searching for deepest leaves
+    vector<unsigned long long> worstKeysBase = ht.get_worst_case_keys();
+    vector<unsigned long long> worstKeys;
+    worstKeys.reserve(n);
+    for (long long i = 0; i < n; i++) worstKeys.push_back(worstKeysBase[i % worstKeysBase.size()]);
+    shuffle(worstKeys.begin(), worstKeys.end(), std::default_random_engine(seed));
+
+    // --- 1. Best Case Timing ---
     auto start_best = high_resolution_clock::now();
     for (long long i = 0; i < n; i++) {
-        stress_ht.search(roots[i % roots.size()]);
+        ht.search(bestKeys[i]);
     }
     auto end_best = high_resolution_clock::now();
     duration<double> time_best = end_best - start_best;
 
-    // 2. Average Case: Searching for randomly picked existing elements from the dataset
-    //    Some will be at root, some deeper — represents typical usage.
+    // --- 2. Average Case Timing ---
     auto start_avg = high_resolution_clock::now();
     for (long long i = 0; i < n; i++) {
-        stress_ht.search(dataset[i % n].key);
+        ht.search(avgKeys[i]);
     }
     auto end_avg = high_resolution_clock::now();
     duration<double> time_avg = end_avg - start_avg;
 
-    // 3. Worst Case: Searching for keys that DO NOT exist, forcing full traversal to null.
-    //    Every search must go from root all the way to the deepest leaf before giving up.
-    //    Keys are randomized (not sequential) to prevent CPU cache advantages.
-    vector<unsigned long long> fake_keys(n);
-    mt19937_64 rng(12345);
-    for (long long i = 0; i < n; i++) {
-        fake_keys[i] = 9900000000ULL + (rng() % 100000000ULL);
-    }
+    // --- 3. Worst Case Timing ---
     auto start_worst = high_resolution_clock::now();
     for (long long i = 0; i < n; i++) {
-        stress_ht.search(fake_keys[i]);
+        ht.search(worstKeys[i]);
     }
     auto end_worst = high_resolution_clock::now();
     duration<double> time_worst = end_worst - start_worst;
