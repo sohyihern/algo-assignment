@@ -11,7 +11,7 @@
 // *********************************************************
 // Task Distribution
 // Member_1:
-// Member_2: Dataset generator
+// Member_2: Dataset generator，radix_sort.cpp, radix_sort_step.cpp
 // Member_3: 
 // Member_4:
 // *********************************************************
