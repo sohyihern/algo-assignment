@@ -1,20 +1,21 @@
 // *********************************************************
 // Program: radix_sort_step.cpp
 // Course: CCP6214 Algorithm Design and Analysis
-// Lecture Class: TC4L
-// Tutorial Class: T13L
+// Lecture Class: TC6L
+// Tutorial Class: T22L
 // Trimester: 2610
-// Member_1: 243UC246W1 | KOH YOU XIANG | KOH.YOU.XIANG@student.mmu.edu.my | 019-6581165
-// Member_2: 243UC246W0 | SOH YI HERN | SOH.YI.HERN@student.mmu.edu.my | 018-2991143
-// Member_3: 243UC246W3 | YAP JIET IN | YAP.JIET.IN@student.mmu.edu.my | 011-10991332
-// Member_4: 251UC250KN | PATRICK TOH TZY GUAN | PATRICK.TOH.TZY@student.mmu.edu.my | 0182086422
+//Member_1: 243UC246W1 | KOH YOU XIANG | KOH.YOU.XIANG@student.mmu.edu.my | 019-6581165
+//Member_2: 251UC250KN | PATRICK TOH TZY GUAN | PATRICK.TOH.TZY@student.mmu.edu.my | 0182086422
+//Member_3: 243UC246W0 | SOH YI HERN | SOH.YI.HERN@student.mmu.edu.my | 018-2991143
+//Member_4: 243UC246W3 | YAP JIET IN | YAP.JIET.IN@student.mmu.edu.my | 011-10991332
 // *********************************************************
 // Task Distribution
-// Member_1:
-// Member_2: Radix sort step
-// Member_3:
-// Member_4:
+// Member_1: Hash table search, Hash table search step
+// Member_2: Data Generation
+// Member_3: Radix sort, Radix sort step 
+// Member_4: Heap sort, Heap sort step
 // *********************************************************
+
 
 #include <iostream>
 #include <fstream>

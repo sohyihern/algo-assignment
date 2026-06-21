@@ -5,15 +5,15 @@
 // Tutorial Class: T22L
 // Trimester: 2610
 // Member_1: 243UC246W1 | KOH YOU XIANG | KOH.YOU.XIANG@student.mmu.edu.my | 019-6581165
-// Member_2: 243UC246W0 | SOH YI HERN | SOH.YI.HERN@student.mmu.edu.my | 018-2991143
-// Member_3: 243UC246W3 | YAP JIET IN | YAP.JIET.IN@student.mmu.edu.my | 011-10991332
-// Member_4: 251UC250KN | PATRICK TOH TZY GUAN | PATRICK.TOH.TZY@student.mmu.edu.my | 0182086422
+// Member_2: 251UC250KN | PATRICK TOH TZY GUAN | PATRICK.TOH.TZY@student.mmu.edu.my | 0182086422
+// Member_3: 243UC246W0 | SOH YI HERN | SOH.YI.HERN@student.mmu.edu.my | 018-2991143
+// Member_4: 243UC246W3 | YAP JIET IN | YAP.JIET.IN@student.mmu.edu.my | 011-10991332
 // *********************************************************
 // Task Distribution
-// Member_1:
-// Member_2: Radix sort
-// Member_3:
-// Member_4:
+// Member_1: Hash table search, Hash table search step
+// Member_2: Data Generation
+// Member_3: Radix sort, Radix sort step
+// Member_4: Heap sort, Heap sort step
 // *********************************************************
 
 #include <iostream>
@@ -26,23 +26,29 @@ using namespace std;
 using namespace std::chrono;
 
 // ── Data model + CSV reader/writer (was in utils.h/.cpp) ──
-struct Record {
+struct Record
+{
     unsigned long long key;
     string value;
 };
 
-vector<Record> read_dataset(const string& filename) {
+vector<Record> read_dataset(const string &filename)
+{
     vector<Record> dataset;
     ifstream file(filename);
-    if (!file.is_open()) {
+    if (!file.is_open())
+    {
         cout << "Error: Could not open file " << filename << endl;
         return dataset;
     }
     string line;
-    while (getline(file, line)) {
-        if (line.empty()) continue;
+    while (getline(file, line))
+    {
+        if (line.empty())
+            continue;
         size_t commaPos = line.find(',');
-        if (commaPos != string::npos) {
+        if (commaPos != string::npos)
+        {
             Record rec;
             rec.key = stoull(line.substr(0, commaPos));
             rec.value = line.substr(commaPos + 1);
@@ -53,65 +59,78 @@ vector<Record> read_dataset(const string& filename) {
     return dataset;
 }
 
-void write_dataset(const string& filename, const vector<Record>& dataset) {
+void write_dataset(const string &filename, const vector<Record> &dataset)
+{
     ofstream outFile(filename);
-    if (!outFile.is_open()) {
+    if (!outFile.is_open())
+    {
         cout << "Error: Could not open file for writing: " << filename << endl;
         return;
     }
-    for (size_t i = 0; i < dataset.size(); i++) {
+    for (size_t i = 0; i < dataset.size(); i++)
+    {
         outFile << dataset[i].key << "/" << dataset[i].value;
-        if (i != dataset.size() - 1) outFile << "\n";
+        if (i != dataset.size() - 1)
+            outFile << "\n";
     }
     outFile.close();
 }
 
 // Counting sort by digit place value: 1, 10, 100, ...
-void countingSortByDigit(vector<Record> &records, unsigned long long place) {
+void countingSortByDigit(vector<Record> &records, unsigned long long place)
+{
     const int base = 10;
     int n = records.size();
 
     vector<Record> output(n);
     int count[base] = {0};
 
-    for (int i = 0; i < n; i++) {
+    for (int i = 0; i < n; i++)
+    {
         int digit = (records[i].key / place) % 10;
         count[digit]++;
     }
 
-    for (int i = 1; i < base; i++) {
+    for (int i = 1; i < base; i++)
+    {
         count[i] += count[i - 1];
     }
 
     // Go from right to left to keep radix sort stable
-    for (int i = n - 1; i >= 0; i--) {
+    for (int i = n - 1; i >= 0; i--)
+    {
         int digit = (records[i].key / place) % 10;
         output[count[digit] - 1] = records[i];
         count[digit]--;
     }
 
-    for (int i = 0; i < n; i++) {
+    for (int i = 0; i < n; i++)
+    {
         records[i] = output[i];
     }
 }
 
-void radixSort(vector<Record> &records) {
+void radixSort(vector<Record> &records)
+{
     // Since assignment requires 10-digit integers,
     // process from rightmost digit to leftmost digit.
     unsigned long long place = 1;
 
-    for (int digitPosition = 1; digitPosition <= 10; digitPosition++) {
+    for (int digitPosition = 1; digitPosition <= 10; digitPosition++)
+    {
         countingSortByDigit(records, place);
         place *= 10;
     }
 }
 
-string getSizeFromFilename(const string &filename) {
+string getSizeFromFilename(const string &filename)
+{
     // Example: dataset_1000.csv -> 1000
     size_t start = filename.find("dataset_");
-    size_t end   = filename.find(".csv");
+    size_t end = filename.find(".csv");
 
-    if (start == string::npos || end == string::npos) {
+    if (start == string::npos || end == string::npos)
+    {
         return "n";
     }
 
@@ -119,9 +138,11 @@ string getSizeFromFilename(const string &filename) {
     return filename.substr(start, end - start);
 }
 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[])
+{
     // Usage: radix_sort <dataset_file.csv>
-    if (argc < 2) {
+    if (argc < 2)
+    {
         cerr << "Usage: " << argv[0] << " <dataset_file.csv>" << endl;
         return 1;
     }
@@ -130,7 +151,8 @@ int main(int argc, char* argv[]) {
 
     vector<Record> records = read_dataset(inputFilename);
 
-    if (records.empty()) {
+    if (records.empty())
+    {
         cout << "No records found." << endl;
         return 1;
     }
