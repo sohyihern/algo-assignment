@@ -60,7 +60,7 @@ void write_dataset(const string& filename, const vector<Record>& dataset) {
         return;
     }
     for (size_t i = 0; i < dataset.size(); i++) {
-        outFile << dataset[i].key << "/" << dataset[i].value;
+        outFile << dataset[i].key << "," << dataset[i].value;
         if (i != dataset.size() - 1) outFile << "\n";
     }
     outFile.close();
