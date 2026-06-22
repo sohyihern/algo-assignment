@@ -65,23 +65,27 @@ foreach ($n in 1000,5000,10000,50000,100000,500000,1000000,5000000,10000000,5000
 foreach ($n in 1000,5000,10000,50000,100000,500000,1000000,5000000,10000000,50000000) { .\heap_sort.exe "dataset_$n.csv" }
 ```
 
-### 3.4 Hash table search (best / average / worst timing)
-Auto-picks an existing key (first key in each file) for the search.
+### 3.4 Hash table search (Will generate query file,then use query file to generate search result file and time analysis file)
+
 ```powershell
-foreach ($n in 1000,5000,10000,50000,100000,500000,1000000,5000000,10000000,50000000) {
-    $key = (Get-Content "dataset_$n.csv" -First 1).Split(',')[0]
-    .\hash_table_search.exe "dataset_$n.csv" $key
-}
+##(.\hash_table_search_step.exe dataset_<size> <query size> )
+.\hash_table_search.exe dataset_1000.csv 100
 ```
 
 ### 3.5 Radix sort step (rows 1–7)
 ```powershell
 foreach ($n in 1000,5000,10000,50000,100000,500000,1000000,5000000,10000000,50000000) { .\radix_sort_step.exe "dataset_$n.csv" 1 7 }
+
+## For Only one
+.\radix_sort_step.exe "dataset_1000.csv" 1 7
 ```
 
 ### 3.6 Heap sort step (rows 1–7)
 ```powershell
 foreach ($n in 1000,5000,10000,50000,100000,500000,1000000,5000000,10000000,50000000) { .\heap_sort_step.exe "dataset_$n.csv" 1 7 }
+
+## For Only one
+.\heap_sort_step.exe "dataset_1000.csv" 1 7
 ```
 
 ### 3.7 Hash table search step
@@ -90,7 +94,13 @@ foreach ($n in 1000,5000,10000,50000,100000,500000,1000000,5000000,10000000,5000
     $key = (Get-Content "dataset_$n.csv" -First 1).Split(',')[0]
     .\hash_table_search_step.exe "dataset_$n.csv" $key
 }
+
+### For only one(.\hash_table_search_step.exe <csv file> <key> )
+``` 
+.\hash_table_search_step.exe dataset_1000.csv 1342720758
 ```
+
+
 
 > The **step** programs (3.5–3.7) show the steps for only rows 1–7, so you
 > normally just need them on the **smallest** size (1000) for the demo. The loops
