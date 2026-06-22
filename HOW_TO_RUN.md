@@ -76,17 +76,17 @@ foreach ($n in 1000,5000,10000,50000,100000,500000,1000000,5000000,10000000,5000
 
 ### 3.5 Radix sort step (rows 1–7)
 ```powershell
-foreach ($n in 1000) { .\radix_sort_step.exe "dataset_$n.csv" 1 7 }
+foreach ($n in 1000,5000,10000,50000,100000,500000,1000000,5000000,10000000,50000000) { .\radix_sort_step.exe "dataset_$n.csv" 1 7 }
 ```
 
 ### 3.6 Heap sort step (rows 1–7)
 ```powershell
-foreach ($n in 1000) { .\heap_sort_step.exe "dataset_$n.csv" 1 7 }
+foreach ($n in 1000,5000,10000,50000,100000,500000,1000000,5000000,10000000,50000000) { .\heap_sort_step.exe "dataset_$n.csv" 1 7 }
 ```
 
 ### 3.7 Hash table search step
 ```powershell
-foreach ($n in 1000) {
+foreach ($n in 1000,5000,10000,50000,100000,500000,1000000,5000000,10000000,50000000) {
     $key = (Get-Content "dataset_$n.csv" -First 1).Split(',')[0]
     .\hash_table_search_step.exe "dataset_$n.csv" $key
 }
