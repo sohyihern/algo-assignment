@@ -68,6 +68,12 @@ foreach ($n in 1000,5000,10000,50000,100000,500000,1000000,5000000,10000000,5000
 ### 3.4 Hash table search (Will generate query file,then use query file to generate search result file and time analysis file)
 
 ```powershell
+# For 10% size of dataset
+foreach ($n in 1000,5000,10000,50000,100000,500000,1000000,5000000,10000000,50000000) {
+    $query_size = $n / 10
+    .\hash_table_search.exe "dataset_$n.csv" $query_size
+}
+
 ##(.\hash_table_search_step.exe dataset_<size> <query size> )
 .\hash_table_search.exe dataset_1000.csv 100
 ```
